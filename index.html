@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+  <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <style>
+    :root {
+      --mdc-theme-primary: #A60C28;
+    }
+	 
+	  
+    body {margin: 0;}
+    main {margin-left: 8px;}
+	
+	  
+	  .viewShow{
+			display: block;
+	  }  
+	  
+	  .viewHidden{
+		  display: none;
+	  }	  
+  </style>
+
+  </head>
+  <body>  
+    
+    <aside class="mdc-drawer mdc-drawer--modal">
+    <div class="mdc-drawer__content">
+      <nav class="mdc-list">
+        <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page" onclick = "return showScreen('#Home', '#Search', '#Table', '#Chart');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
+          <span class="mdc-list-item__text">Home</span>
+        </a>
+        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Chart');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
+          <span class="mdc-list-item__text">Search</span>
+        </a>
+        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Chart');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >table_chart</i>
+          <span class="mdc-list-item__text">Table</span>
+        </a>
+		<a class="mdc-list-item" href="#chart" onclick = "return showScreen('#Chart', '#Search', '#Table', '#Home');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >show_chart</i>
+          <span class="mdc-list-item__text">Chart</span>
+        </a>  
+      </nav>
+    </div>
+  </aside>
+
+  <div class="mdc-drawer-scrim"></div>
+
+<header class="mdc-top-app-bar">
+  <div class="mdc-top-app-bar__row">
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button">menu</button>
+      <span class="mdc-top-app-bar__title">Big Project: Covid-19 Data by US States</span>
+    </section>
+  </div>
+</header>
+
+	  
+	  <!-- display on page -->
+  <main class="mdc-top-app-bar--fixed-adjust">
+	  <div class="viewShow" id="Home">
+		  <h1>Home</h1>
+		  Select from the side menu by clicking the three lines at the top left hand corner
+	  </div>
+	 
+	  <div class="viewHidden" id="Search">
+		  <h1>Search</h1>
+		  <p>Find states to chart by typing in the box below</p>
+		  <p>Click add to add a state to your list</p>
+		  <p>Click chart to chart the state in your list</p>
+		  <input id="state" list="states" class="mdc-text-field__input"> 
+		  <datalist id="states"></datalist>
+		  <button id="addButton" class="mdc-button mdc-button--raised">
+			  <div class="mdc-button__ripple"></div>
+			  <span class="mdc-button__label">Add</span>
+		  </button>
+		  <div id="usersStates"></div>
+		  <button id="chartButton" class="mdc-button mdc-button--raised">
+			  <div class="mdc-button__ripple"></div>
+			  <span class="mdc-button__label">Chart</span>
+			  
+		  </button>
+		  
+	  </div>
+	  
+	  <div class="viewHidden" id="Table">
+		  <div class= "mdc-data-table" id="divTable">
+			  
+		  </div>	  
+	  </div>
+	  
+	  <div class="viewHidden" id="Chart">
+		  <div id="divChart">
+			  
+			  
+		  </div>
+		  Content of Chart
+	  </div>
+	  
+  </main>
+
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"> </script>
+    <script>
+    mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
+		
+	google.charts.load('current', {'packages':['corechart']});
+	
+		
+
+    const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+	const statesEndpoint =  "https://covidtracking.com/api/v1/states/daily.json"; 
+	const statesList = [];
+	let data;
+	  
+	  
+	//handles side menu
+    document.querySelector(".mdc-top-app-bar__navigation-icon")
+      .addEventListener("click", 
+          (e) => {drawer.open = true;}
+      );
+	  
+	  //handles which screen to show	
+	  const showScreen = (shown, hidden1, hidden2, hidden3) => {
+		  document.querySelector(shown).setAttribute("class", "viewShown");
+		  document.querySelector(hidden1).setAttribute("class", "viewHidden");
+		  document.querySelector(hidden2).setAttribute("class", "viewHidden");
+		  document.querySelector(hidden3).setAttribute("class", "viewHidden");
+
+		  return false;
+	  }
+	  
+	  
+	  
+      document.querySelector("#addButton")
+        .addEventListener("click",(e) => {
+          let stateName = document.querySelector("#state").value;
+          statesList.push(stateName);
+		  document.querySelector("#usersStates")
+		  .textContent = statesList.toString();
+        });
+
+	  
+	 //fetch data from json	
+      window.addEventListener("load",() => {
+        fetch(statesEndpoint)
+          .then (response => response.json())
+          .then (json => {
+            data = json;
+			
+			for(i in data){
+				let option = document.createElement("option");
+				option.value = i;
+				document.querySelector("#states").appendChild(option);
+			}
+          })
+
+      });
+/*		
+	//creates table	
+	  const generateTable = () =>{ 
+		  var divTable = document.querySelector("#divTable");
+		  var tbl = document.createElement("table");
+		  tbl.setAttribute("class", "mdc-data-table__table");
+		  var tblBody = document.createElement("tbody");
+		  tblBody.setAttribute("class", "mdc-data-table__content");
+		  var tblHead = document.createElement("thead");
+		  var firstRowHeader = document.createElement("th");
+		  firstRowHeader.setAttribute("class", "mdc-data-table__header-cell");
+		  var headCellOne = document.createTextNode("date");
+		  firstRowHeader.appendChild(headCellOne);
+		  tblHead.appendChild(firstRowHeader);
+		  
+	
+		  //create first row of column headers
+		  for(var k = 0; k < countriesList.length; k++){
+			  var headerCountry = document.createElement("th");
+			  headerCountry.setAttribute("class","mdc-data-table__header-cell");
+			  var countryText = document.createTextNode(countriesList[k]);
+			  headerCountry.appendChild(countryText);
+			  tblHead.appendChild(headerCountry);
+			  
+		  }
+		  
+		  
+		  var rows = [];
+		  var counter = 0;
+		  // creating all cells
+		 
+			for(var z = 0; z < data[countriesList[0]].length; z++){
+				var bodyRow = document.createElement("tr");
+				bodyRow.setAttribute("class", "mdc-data-table__row");
+				var selectedData = data[countriesList[0]];
+				
+				var cell = document.createElement("td");	
+			    cell.setAttribute("class", "mdc-data-table__cell");
+				var cellText = document.createTextNode(selectedData[z.toString()].date);
+				cell.appendChild(cellText);
+				bodyRow.appendChild(cell);
+
+				var countryCell = document.createElement("td");
+				countryCell.setAttribute("class", "mdc-data-table__cell");
+				var countryCellText = document.createTextNode(selectedData[z.toString()].recovered);
+				countryCell.appendChild(countryCellText);
+				bodyRow.appendChild(countryCell);
+				
+				
+				rows.push(bodyRow);
+				
+			} 
+		  
+		  //enters case numbers in cells
+			for(var a = 1; a < countriesList.length; a++){
+				for(var z = 0; z < data[countriesList[a]].length; z++){
+					var selectedData = data[countriesList[a]];
+					var countryCell = document.createElement("td");
+					countryCell.setAttribute("class", "mdc-data-table__cell");
+					var countryCellText = document.createTextNode(selectedData[z.toString()].recovered);
+					countryCell.appendChild(countryCellText);
+					rows[z].appendChild(countryCell);
+
+
+
+				} 
+			}
+		  
+			
+		  	for(var y = 0; y < rows.length; y++){
+				tblBody.appendChild(rows[y]);
+			}
+		  
+		  
+		  
+		  tbl.appendChild(tblHead);
+		  tbl.appendChild(tblBody);
+		  divTable.appendChild(tbl);
+		  
+	  }	
+	  
+	  
+	  //creates line chart
+	  const generateChart = () => {
+		let chartInfo = [];
+	
+        let datesAxis = ["date"];
+        for (let i of countriesList) {
+          datesAxis.push(i);
+        }
+		//creates array for chart with data
+        chartInfo.push(datesAxis);
+		
+        for (let j = 0; j < data[countriesList[0]].length; j++) {
+          let rows = [];
+          rows.push(data[countriesList[0]][j]["date"]);
+          
+          for (let k of countriesList){
+            rows.push(data[k][j]["recovered"]);
+          }
+          chartInfo.push(rows); 
+        }
+        
+
+        var dataArray = google.visualization.arrayToDataTable(chartInfo);
+		  
+		//format of chart  
+        var chartFormat = {
+          title: 'Line Chart of Recovered Cases',
+          width: window.innerWidth * .7,
+          height: window.innerHeight * .7,
+          legend: { 
+			  position: 'side' 
+		  },
+		  hAxis: {
+			  title: "Dates",
+			  slantedText: true
+		  },
+		  vAxis:{
+			title:"Cases",
+		  }
+       	 };
+
+        var graph = new google.visualization.LineChart(document.querySelector('#Chart'));
+
+        graph.draw(dataArray, chartFormat);
+		  
+		  
+	  }
+	  
+	  
+	  
+	  
+	  document.querySelector("#chartButton")
+		  .addEventListener("click", (e) => {
+		  generateTable(); 
+		  generateChart();	   
+	   });
+  */
+
+    </script>
+  </body>
+</html>
