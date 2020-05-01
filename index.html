@@ -45,7 +45,7 @@
           <span class="mdc-list-item__text">Table</span>
         </a>
 		<a class="mdc-list-item" href="#chart" onclick = "return showScreen('#Graph', '#Search', '#Table', '#Home');">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >show_graph</i>
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >assessment</i>
           <span class="mdc-list-item__text">Graph</span>
         </a>  
       </nav>
@@ -75,7 +75,7 @@
 		  <h1>Search</h1>
 		  <p>Find states to chart by typing in the box below</p>
 		  <p>Click add to add a state to your list</p>
-		  <p>Click chart to chart the state in your list</p>
+		  <p>Choose a statistic to report and click the corresponding button</p>
 		  <input id="state" list="states" class="mdc-text-field__input"> 
 		  <datalist id="states"></datalist>
 		  <button id="addButton" class="mdc-button mdc-button--raised">
@@ -83,10 +83,23 @@
 			  <span class="mdc-button__label">Add</span>
 		  </button>
 		  <div id="usersStates"></div>
+		  <div id="statButtons">
+			  <button id="positiveButton" class="mdc-button mdc-button--raised">
+				  <div class="mdc-button__ripple"></div>
+				  <span class="mdc-button__label">Positive</span>
+		  	  </button>
+			  <button id="recoveredButton" class="mdc-button mdc-button--raised">
+				  <div class="mdc-button__ripple"></div>
+				  <span class="mdc-button__label">Recovered</span>
+		  	  </button>
+			  <button id="deathButton" class="mdc-button mdc-button--raised">
+				  <div class="mdc-button__ripple"></div>
+				  <span class="mdc-button__label">Deaths</span>
+		  	  </button>
+		  </div>
 		  <button id="graphButton" class="mdc-button mdc-button--raised">
 			  <div class="mdc-button__ripple"></div>
 			  <span class="mdc-button__label">Graph</span>
-			  
 		  </button>
 		  
 	  </div>
@@ -120,6 +133,9 @@
 	const statesEndpoint =  "https://covidtracking.com/api/v1/states/daily.json"; 
 	const statesList = [];
 	let data;
+	let positive = false;
+	let recovered = false;	
+	let death = false;	
 	  
 	  
 	//handles side menu
@@ -138,9 +154,9 @@
 		  return false;
 	  }
 	  
-	  
-	  
 
+	  
+	  
 	  
 	 //fetch data from json	
       window.addEventListener("load",() => {
@@ -182,6 +198,36 @@
 			  .textContent = statesList.toString();
 			});	
 		
+		document.querySelector("#positiveButton")
+			.addEventListener("click", (e) => {
+			positive = true;
+		});
+		
+		document.querySelector("#recoveredButton")
+			.addEventListener("click", (e) => {
+			recovered = true;
+		});
+		
+		document.querySelector("#deathButton")
+			.addEventListener("click", (e) => {
+			death = true;
+		});
+		
+		const displayStat = (v) => {
+			if(positive === true){
+				return v.positive;
+			}
+			else if(recovered === true){
+				return v.recovered;
+			}
+			else if(death == true){
+				return v.death;
+			}
+			else{
+				return 0;
+			}
+		}
+		
 		
 		
 	//creates table	
@@ -210,10 +256,6 @@
 		  }
 		  
 		  
-		
-		  
-		  
-		  
 		  var rows = [];
 		  var counter = 0;
 		  var displayData = [];
@@ -233,74 +275,68 @@
 				}
 				
 				datesArr.sort();
-				
-				
-			/*
-				var stateCell = document.createElement("td");
-				stateCell.setAttribute("class", "mdc-data-table__cell");
-				var stateCellText = document.createTextNode(selectedData[z].recovered);
-				stateCell.appendChild(stateCellText);
-				bodyRow.appendChild(stateCell);
-			*/
+
 			}
 		 }	
 		  
 		  
-		  
-		  
-		  
+		 //build map 
 		 for(var x = 0; x < datesArr.length; x++){
 			 let statesArr = [];
 			 for(var y = 0; y < statesList.length; y++){
-				 statesArr.push(x);
+				 statesArr.push(null);
 			 }
 			 
 			 myMap.set(datesArr[x], statesArr);
 		 } 
 		  
 		  
+		  for(var z = 0; z < data.length; z++){
+			  let foundState = statesList.find(element => element === data[z].state);
+			  if(foundState){
+				  let currentDate = data[z].date;
+				  let mapValue = myMap.get(currentDate);
+				  if(mapValue){
+					  let foundIndex = statesList.findIndex(element => element === data[z].state);
+					  mapValue[foundIndex] = data[z];
+				  }
+			  }
+		  }
 		  
-		 //display dates column
-		 for(var i = 0; i < datesArr.length; i++){
+
+		  
+		 //display numbers in cells
+		 for (let [k, v] of myMap){
 			 var bodyRow = document.createElement("tr");
 			 bodyRow.setAttribute("class", "mdc-data-table__row");
 			 var cell = document.createElement("td");
 			 cell.setAttribute("class", "mdc-data-table__cell");
-			 var cellText = document.createTextNode(datesArr[i]);
+			 
+			 //display dates
+			 var cellText = document.createTextNode(k);
 			 cell.appendChild(cellText);
 			 bodyRow.appendChild(cell);
 			 
+			 for(var a = 0; a < statesList.length; a++){
+				 var stateCell = document.createElement("td");
+			 	 stateCell.setAttribute("class", "mdc-data-table__cell");
+				 let count = 0;
+				 if(v[a]){
+					 count = displayStat(v[a]);
+				 }
+				 var stateCellText = document.createTextNode(count);
+				 stateCell.appendChild(stateCellText);
+				 bodyRow.appendChild(stateCell);
+			 }
+			 
+			 
 			 rows.push(bodyRow);
 			 
-		 } 
-		  
-		 //create copy of dates array
-		  
-		  
-		  
-		  
-		  /*
-		  //enters case numbers in cells
-			for(var a = 1; a < countriesList.length; a++){
-				for(var z = 0; z < data[countriesList[a]].length; z++){
-					var selectedData = data[countriesList[a]];
-					var countryCell = document.createElement("td");
-					countryCell.setAttribute("class", "mdc-data-table__cell");
-					var countryCellText = document.createTextNode(selectedData[z.toString()].recovered);
-					countryCell.appendChild(countryCellText);
-					rows[z].appendChild(countryCell);
-
-
-
-				} 
-			}
-		  */
+		 }  
 			
 		  	for(var y = 0; y < rows.length; y++){
 				tblBody.appendChild(rows[y]);
 			}
-		  
-		  
 		  
 		  tbl.appendChild(tblHead);
 		  tbl.appendChild(tblBody);
