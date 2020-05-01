@@ -217,50 +217,68 @@
 		  var rows = [];
 		  var counter = 0;
 		  var displayData = [];
+		  let myMap = new Map();
+		  var datesArr = [];
 		  
 		  
 		  // creating all cells
 		 for(var y = 0; y < statesList.length; y++){
 			for(var z = 0; z < data.length; z++){
 				if(data[z].state === statesList[y]){
-					var obj = 
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					/*
-					var bodyRow = document.createElement("tr");
-					bodyRow.setAttribute("class", "mdc-data-table__row");
-					var selectedData = data[statesList[0]];
-
-					var cell = document.createElement("td");	
-					cell.setAttribute("class", "mdc-data-table__cell");
-					var cellText = document.createTextNode(selectedData[z].date);
-					cell.appendChild(cellText);
-					bodyRow.appendChild(cell);
-					*/
+					let currentDate = data[z].date;
+					let foundDate = datesArr.find(element => element === currentDate);
+					if(!foundDate){
+						datesArr.push(currentDate);
+					}
 				}
 				
-/*
+				datesArr.sort();
+				
+				
+			/*
 				var stateCell = document.createElement("td");
 				stateCell.setAttribute("class", "mdc-data-table__cell");
 				var stateCellText = document.createTextNode(selectedData[z].recovered);
 				stateCell.appendChild(stateCellText);
 				bodyRow.appendChild(stateCell);
-				
-				
-				rows.push(bodyRow);
 			*/
 			}
-		 }	 
+		 }	
+		  
+		  
+		  
+		  
+		  
+		 for(var x = 0; x < datesArr.length; x++){
+			 let statesArr = [];
+			 for(var y = 0; y < statesList.length; y++){
+				 statesArr.push(x);
+			 }
+			 
+			 myMap.set(datesArr[x], statesArr);
+		 } 
+		  
+		  
+		  
+		 //display dates column
+		 for(var i = 0; i < datesArr.length; i++){
+			 var bodyRow = document.createElement("tr");
+			 bodyRow.setAttribute("class", "mdc-data-table__row");
+			 var cell = document.createElement("td");
+			 cell.setAttribute("class", "mdc-data-table__cell");
+			 var cellText = document.createTextNode(datesArr[i]);
+			 cell.appendChild(cellText);
+			 bodyRow.appendChild(cell);
+			 
+			 rows.push(bodyRow);
+			 
+		 } 
+		  
+		 //create copy of dates array
+		  
+		  
+		  
+		  
 		  /*
 		  //enters case numbers in cells
 			for(var a = 1; a < countriesList.length; a++){
@@ -276,12 +294,12 @@
 
 				} 
 			}
-		  
+		  */
 			
 		  	for(var y = 0; y < rows.length; y++){
 				tblBody.appendChild(rows[y]);
 			}
-		  */
+		  
 		  
 		  
 		  tbl.appendChild(tblHead);
