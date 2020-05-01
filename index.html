@@ -32,21 +32,21 @@
     <aside class="mdc-drawer mdc-drawer--modal">
     <div class="mdc-drawer__content">
       <nav class="mdc-list">
-        <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page" onclick = "return showScreen('#Home', '#Search', '#Table', '#Chart');">
+        <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page" onclick = "return showScreen('#Home', '#Search', '#Table', '#Graph');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
           <span class="mdc-list-item__text">Home</span>
         </a>
-        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Chart');">
+        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Graph');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
           <span class="mdc-list-item__text">Search</span>
         </a>
-        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Chart');">
+        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Graph');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >table_chart</i>
           <span class="mdc-list-item__text">Table</span>
         </a>
-		<a class="mdc-list-item" href="#chart" onclick = "return showScreen('#Chart', '#Search', '#Table', '#Home');">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >show_chart</i>
-          <span class="mdc-list-item__text">Chart</span>
+		<a class="mdc-list-item" href="#chart" onclick = "return showScreen('#Graph', '#Search', '#Table', '#Home');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >show_graph</i>
+          <span class="mdc-list-item__text">Graph</span>
         </a>  
       </nav>
     </div>
@@ -83,9 +83,9 @@
 			  <span class="mdc-button__label">Add</span>
 		  </button>
 		  <div id="usersStates"></div>
-		  <button id="chartButton" class="mdc-button mdc-button--raised">
+		  <button id="graphButton" class="mdc-button mdc-button--raised">
 			  <div class="mdc-button__ripple"></div>
-			  <span class="mdc-button__label">Chart</span>
+			  <span class="mdc-button__label">Graph</span>
 			  
 		  </button>
 		  
@@ -97,12 +97,12 @@
 		  </div>	  
 	  </div>
 	  
-	  <div class="viewHidden" id="Chart">
-		  <div id="divChart">
+	  <div class="viewHidden" id="Graph">
+		  <div id="divGraph">
 			  
 			  
 		  </div>
-		  Content of Chart
+		  Content of graph
 	  </div>
 	  
   </main>
@@ -140,13 +140,6 @@
 	  
 	  
 	  
-      document.querySelector("#addButton")
-        .addEventListener("click",(e) => {
-          let stateName = document.querySelector("#state").value;
-          statesList.push(stateName);
-		  document.querySelector("#usersStates")
-		  .textContent = statesList.toString();
-        });
 
 	  
 	 //fetch data from json	
@@ -156,15 +149,41 @@
           .then (json => {
             data = json;
 			
+			let statesArray = [];
+			
 			for(i in data){
-				let option = document.createElement("option");
-				option.value = i;
-				document.querySelector("#states").appendChild(option);
+				let found = statesArray.find(element => element === data[i].state);
+				if(!found){ 
+					statesArray.push(data[i].state);
+				}
 			}
+			
+			if(statesArray.length > 0){
+				statesArray.sort();
+			}
+			
+			for(k in statesArray){
+	
+				let option = document.createElement("option");
+				option.value = statesArray[k];
+				document.querySelector("#states").appendChild(option);
+				
+			}
+			
           })
 
       });
-/*		
+	
+		document.querySelector("#addButton")
+			.addEventListener("click",(e) => {
+			  let stateName = document.querySelector("#state").value;
+			  statesList.push(stateName);
+			  document.querySelector("#usersStates")
+			  .textContent = statesList.toString();
+			});	
+		
+		
+		
 	//creates table	
 	  const generateTable = () =>{ 
 		  var divTable = document.querySelector("#divTable");
@@ -181,42 +200,68 @@
 		  
 	
 		  //create first row of column headers
-		  for(var k = 0; k < countriesList.length; k++){
-			  var headerCountry = document.createElement("th");
-			  headerCountry.setAttribute("class","mdc-data-table__header-cell");
-			  var countryText = document.createTextNode(countriesList[k]);
-			  headerCountry.appendChild(countryText);
-			  tblHead.appendChild(headerCountry);
+		  for(var i = 0; i < statesList.length; i++){
+			  var headerState = document.createElement("th");
+			  headerState.setAttribute("class","mdc-data-table__header-cell");
+			  var stateText = document.createTextNode(statesList[i]);
+			  headerState.appendChild(stateText);
+			  tblHead.appendChild(headerState);
 			  
 		  }
 		  
 		  
+		
+		  
+		  
+		  
 		  var rows = [];
 		  var counter = 0;
+		  var displayData = [];
+		  
+		  
 		  // creating all cells
-		 
-			for(var z = 0; z < data[countriesList[0]].length; z++){
-				var bodyRow = document.createElement("tr");
-				bodyRow.setAttribute("class", "mdc-data-table__row");
-				var selectedData = data[countriesList[0]];
-				
-				var cell = document.createElement("td");	
-			    cell.setAttribute("class", "mdc-data-table__cell");
-				var cellText = document.createTextNode(selectedData[z.toString()].date);
-				cell.appendChild(cellText);
-				bodyRow.appendChild(cell);
+		 for(var y = 0; y < statesList.length; y++){
+			for(var z = 0; z < data.length; z++){
+				if(data[z].state === statesList[y]){
+					var obj = 
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					/*
+					var bodyRow = document.createElement("tr");
+					bodyRow.setAttribute("class", "mdc-data-table__row");
+					var selectedData = data[statesList[0]];
 
-				var countryCell = document.createElement("td");
-				countryCell.setAttribute("class", "mdc-data-table__cell");
-				var countryCellText = document.createTextNode(selectedData[z.toString()].recovered);
-				countryCell.appendChild(countryCellText);
-				bodyRow.appendChild(countryCell);
+					var cell = document.createElement("td");	
+					cell.setAttribute("class", "mdc-data-table__cell");
+					var cellText = document.createTextNode(selectedData[z].date);
+					cell.appendChild(cellText);
+					bodyRow.appendChild(cell);
+					*/
+				}
+				
+/*
+				var stateCell = document.createElement("td");
+				stateCell.setAttribute("class", "mdc-data-table__cell");
+				var stateCellText = document.createTextNode(selectedData[z].recovered);
+				stateCell.appendChild(stateCellText);
+				bodyRow.appendChild(stateCell);
 				
 				
 				rows.push(bodyRow);
-				
-			} 
-		  
+			*/
+			}
+		 }	 
+		  /*
 		  //enters case numbers in cells
 			for(var a = 1; a < countriesList.length; a++){
 				for(var z = 0; z < data[countriesList[a]].length; z++){
@@ -236,16 +281,16 @@
 		  	for(var y = 0; y < rows.length; y++){
 				tblBody.appendChild(rows[y]);
 			}
-		  
+		  */
 		  
 		  
 		  tbl.appendChild(tblHead);
 		  tbl.appendChild(tblBody);
 		  divTable.appendChild(tbl);
-		  
+		 
 	  }	
 	  
-	  
+	  /*
 	  //creates line chart
 	  const generateChart = () => {
 		let chartInfo = [];
@@ -294,15 +339,15 @@
 		  
 	  }
 	  
+	  */
 	  
 	  
-	  
-	  document.querySelector("#chartButton")
+	  document.querySelector("#graphButton")
 		  .addEventListener("click", (e) => {
 		  generateTable(); 
-		  generateChart();	   
+		  //generateChart();	   
 	   });
-  */
+ 
 
     </script>
   </body>
