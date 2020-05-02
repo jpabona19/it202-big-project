@@ -23,7 +23,13 @@
 	  
 	  .viewHidden{
 		  display: none;
-	  }	  
+	  }
+	  
+	  #divMap{
+		  height: 100%;
+	  }
+	  
+	  
   </style>
 
   </head>
@@ -36,18 +42,18 @@
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
           <span class="mdc-list-item__text">Home</span>
         </a>
-        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Graph');">
+        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Map');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
           <span class="mdc-list-item__text">Search</span>
         </a>
-        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Graph');">
+        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Map');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >table_chart</i>
           <span class="mdc-list-item__text">Table</span>
         </a>
-		<a class="mdc-list-item" href="#chart" onclick = "return showScreen('#Graph', '#Search', '#Table', '#Home');">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >assessment</i>
-          <span class="mdc-list-item__text">Graph</span>
-        </a>  
+		<a class="mdc-list-item" href="#map" onclick = "return showScreen('#Map', '#Search', '#Table', '#Home');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">map</i>
+          <span class="mdc-list-item__text">Map</span>
+        </a>    
       </nav>
     </div>
   </aside>
@@ -109,7 +115,7 @@
 			  
 		  </div>	  
 	  </div>
-	  
+	  <!--
 	  <div class="viewHidden" id="Graph">
 		  <div id="divGraph">
 			  
@@ -117,6 +123,26 @@
 		  </div>
 		  Content of graph
 	  </div>
+		-->
+	  
+	  <div class="viewHidden" id="Map">
+		  <!--
+		  <div id="divMap">
+			  
+		  </div>
+		  <button id="mapButton" class="mdc-button mdc-button--raised">
+				  <div class="mdc-button__ripple"></div>
+				  <span class="mdc-button__label">My Location</span>
+		  </button>
+			
+-->
+		  <div id="mapholder"></div>
+		  <form>
+			 <input type="button" onclick="getLocation();" value="Your Location"/>
+		  </form>
+		  Content of Map
+	  </div>
+	  
 	  
   </main>
 
@@ -135,7 +161,9 @@
 	let data;
 	let positive = false;
 	let recovered = false;	
-	let death = false;	
+	let death = false;
+	var userMap;
+	var infoWindow;	
 	  
 	  
 	//handles side menu
@@ -150,6 +178,8 @@
 		  document.querySelector(hidden1).setAttribute("class", "viewHidden");
 		  document.querySelector(hidden2).setAttribute("class", "viewHidden");
 		  document.querySelector(hidden3).setAttribute("class", "viewHidden");
+		  //document.querySelector(hidden4).setAttribute("class", "viewHidden");
+
 
 		  return false;
 	  }
@@ -344,64 +374,55 @@
 		 
 	  }	
 	  
-	  /*
-	  //creates line chart
-	  const generateChart = () => {
-		let chartInfo = [];
-	
-        let datesAxis = ["date"];
-        for (let i of countriesList) {
-          datesAxis.push(i);
-        }
-		//creates array for chart with data
-        chartInfo.push(datesAxis);
-		
-        for (let j = 0; j < data[countriesList[0]].length; j++) {
-          let rows = [];
-          rows.push(data[countriesList[0]][j]["date"]);
-          
-          for (let k of countriesList){
-            rows.push(data[k][j]["recovered"]);
-          }
-          chartInfo.push(rows); 
-        }
-        
-
-        var dataArray = google.visualization.arrayToDataTable(chartInfo);
-		  
-		//format of chart  
-        var chartFormat = {
-          title: 'Line Chart of Recovered Cases',
-          width: window.innerWidth * .7,
-          height: window.innerHeight * .7,
-          legend: { 
-			  position: 'side' 
-		  },
-		  hAxis: {
-			  title: "Dates",
-			  slantedText: true
-		  },
-		  vAxis:{
-			title:"Cases",
-		  }
-       	 };
-
-        var graph = new google.visualization.LineChart(document.querySelector('#Chart'));
-
-        graph.draw(dataArray, chartFormat);
-		  
-		  
-	  }
-	  
-	  */
-	  
 	  
 	  document.querySelector("#graphButton")
 		  .addEventListener("click", (e) => {
-		  generateTable(); 
-		  //generateChart();	   
+		  generateTable(); 	   
 	   });
  
+	 //generate map
+	 function showLocation(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var latlongvalue = position.coords.latitude + ","
+                              + position.coords.longitude;
+		 /*
+            var img_url = "https://maps.googleapis.com/maps/api/staticmap?center="
+                          +latlongvalue+"&zoom=14&size = 400x300&key = AIzaSyB3OimhANJyTXHyq1paiF2GLLR1Ww5f4QE";
+						  */
+		 	var img_url = 
+            document.getElementById("mapholder").innerHTML =
+            "<img src ='"+img_url+"'>";
+         }
+         function errorHandler(err) {
+            if(err.code == 1) {
+               alert("Error: Access is denied!");
+            }else if( err.code == 2) {
+               alert("Error: Position is unavailable!");
+            }
+         }
+         function getLocation(){
+            if(navigator.geolocation){
+               // timeout at 60000 milliseconds (60 seconds)
+               var options = {timeout:60000};
+               navigator.geolocation.getCurrentPosition
+               (showLocation, errorHandler, options);
+            }else{
+               alert("Sorry, browser does not support geolocation!");
+            }
+         }
+	 
+	 
+	 
+		
+		/*
+		document.querySelector("#mapButton")
+		  .addEventListener("click", (e) => {
+		  	//generate map
+	 		initMap();	
+	   });
+	   */
+		
 
     </script>
   </body>
