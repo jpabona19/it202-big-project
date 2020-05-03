@@ -4,12 +4,12 @@
   "description": "Info about Covid-19 Statistics for all US states",
   "icons": [
     {
-      "src": "/app_icon_192.png",
+      "src": "./app_icon_192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/app_icon_512.png",
+      "src": "./app_icon_512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
