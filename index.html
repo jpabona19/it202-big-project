@@ -45,8 +45,8 @@
         </a>
         <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Graph', '#History');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
-          <span class="mdc-list-item__text">Search</span>
-        </a>
+          <span class="mdc-list-item__text"> US Search</span>
+        </a> 
         <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Graph', '#History');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >table_chart</i>
           <span class="mdc-list-item__text">Table</span>
@@ -79,7 +79,11 @@
   <main class="mdc-top-app-bar--fixed-adjust">
 	  <div class="viewShow" id="Home">
 		  <h1>Home</h1>
-		  Select from the side menu by clicking the three lines at the top left hand corner
+		  <p>Select from the side menu by clicking the three lines at the top left hand corner.</p>
+		  <p>Endpoint 1 shows HISTORICAL data for each state.</p>
+		  <p>Endpoint 2 shows CURRENT data for each state.</p>
+		  <p>The table will show the numbers for the user's chosen statistic starting from the first case to today's current date.</p>
+		  <p>The graph will show the numbers for the user's chosen statistic for each chosen state as of today's current date.</p>		  
 	  </div>
 	 
 	  <div class="viewHidden" id="Search">
@@ -114,6 +118,7 @@
 		  </button>
 		  
 	  </div>
+	 
 	  
 	  <div class="viewHidden" id="Table">
 		  <div class= "mdc-data-table" id="divTable">
