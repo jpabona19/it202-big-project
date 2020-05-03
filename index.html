@@ -117,7 +117,8 @@
 	  <div class="viewHidden" id="Table">
 		  <div class= "mdc-data-table" id="divTable">
 			  
-		  </div>	  
+		  </div>
+		  This table shows the history of the states
 	  </div>
 	  
 	  <div class="viewHidden" id="Graph">
@@ -125,12 +126,15 @@
 			  
 			  
 		  </div>
-		  Content of graph
+		  This graph shows the current statistics of your chosen states
 	  </div>
 	  
 	  <div class="viewHidden" id="History">
 		  <div id="divHistory">
-			  
+			  <button id="historyButton" class="mdc-button mdc-button--raised">
+				  <div class="mdc-button__ripple"></div>
+				  <span class="mdc-button__label">Get History</span>
+		  	  </button>
 			  
 		  </div>
 		  Content of history
@@ -142,6 +146,8 @@
 
 
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
     <script>
     mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
 		
@@ -253,6 +259,7 @@
 			death = true;
 		});
 		
+		//
 		const displayStat = (v) => {
 			if(positive === true){
 				return v.positive;
@@ -267,7 +274,6 @@
 				return 0;
 			}
 		}
-		
 		
 		
 	//creates table	
@@ -399,15 +405,13 @@
 		
 		let dataArr = [];
 		for(let j = 0; j < currentData.length; j++){
-			//let dataArr = [];
 			let foundState = statesList.find(element => element === currentData[j].state);
 			if(foundState){
-				dataArr.push(currentData[j].positive);
+				dataArr.push(displayStat(currentData[j]));
 			}
 			chartInfo.push(dataArr);
 			
 		}  
-		//let i = 0;  
 		          
 		
         var dataArray = google.visualization.arrayToDataTable(chartInfo);
@@ -439,7 +443,62 @@
 		  generateTable();
 		  generateGraph();
 	   });
- 
+ 		
+		
+		
+	  document.querySelector("#historyButton")
+		  .addEventListener("click", (e) => {
+		  //
+          // Define your database
+          //
+          var db = new Dexie("states_database");
+          db.version(1).stores({
+			  states: 'name'
+              //friends: 'name,shoeSize'
+          });
+
+          //
+          // Put some data into it
+          
+		  for(var i = 0; i < statesList.length; i++){
+			  db.states.put({name: statesList[i]}).then(function(){
+				  return db.states.get(statesList[i]);
+			  }).then(function(state){
+				  var divHistory = document.querySelector("#divHistory");
+				  var elem = document.createElement("p");
+		  		  var elemText = document.createTextNode(statesList[i]);
+				  elem.appendChild(elemText);
+				  divHistory.appendChild(elem);
+				  
+				  
+				  //alert("Added to List " + states.name);
+				  
+			  }).catch(function(error){
+				  alert("oops: " + error);
+			  });
+		  }		
+		/*
+          db.friends.put({name: "Nicolas", shoeSize: 8}).then (function(){
+              //
+              // Then when data is stored, read from it
+              //
+              return db.friends.get('Nicolas');
+          }).then(function (friend) {
+              //
+              // Display the result
+              //
+              alert ("Nicolas has shoe size " + friend.shoeSize);
+          }).catch(function(error) {
+             //
+             // Finally don't forget to catch any error
+             // that could have happened anywhere in the
+             // code blocks above.
+             //
+             alert ("Ooops: " + error);
+          });
+		  */
+		  
+	  });
 	 
 		
 
