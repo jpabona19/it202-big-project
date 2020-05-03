@@ -2,8 +2,20 @@
   "short_name": "US Covid-19",
   "name": "Covid-19 Data for the US",
   "description": "Info about Covid-19 Statistics for all US states",
+  "icons": [
+    {
+      "src": "app_icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "app_icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
   "start_url": "https://neutral-spain.codio.io/",
-  "background_color": "#3367D6",
+  "background_color": "#A60C28",
   "display": "standalone",
   "scope": "/",
   "theme_color": "#A60C28"
