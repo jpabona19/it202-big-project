@@ -461,43 +461,26 @@
 		  for(var i = 0; i < statesList.length; i++){
 				db.states.add({name: statesList[i]});
 		  }
-		  //let h = 0;
+
 		  
-		  //const states = db.states.toArray();
-		  
+		  let p = document.createElement("p");
+		  let empty = true;
 		  db.states.toArray().then((arr => {
 			  
-			  for(let s of arr){
-				  let p = document.createElement("p");
-				  p.textContext = s.name;
-				  divHistory.appendChild(p);
+			  for(let s of arr){				
+				  //let p = document.createElement("p");
+				  var node = document.createTextNode( 
+													 (empty ? "" : ", ") + s.name);
+				  p.appendChild(node);
+				  //p.textContext = s.name;
+				  //divHistory.appendChild(p);
+			  	  empty = false;
 			  }
 			    
 			  
 		  }));
 		  
-		  
-		  
-/*
-          //
-          // Put some data into it
-          
-		  for(var i = 0; i < statesList.length; i++){
-			  db.states.put({name: statesList[i]}).then(function(){
-				  return db.states.get(statesList[i]);
-			  }).then(function(state){
-				  var divHistory = document.querySelector("#divHistory");
-				  var elem = document.createElement("p");
-		  		  var elemText = document.createTextNode(statesList[i]);
-				  elem.appendChild(elemText);
-				  divHistory.appendChild(elem);
-				  
-				  
-			  }).catch(function(error){
-				  alert("oops: " + error);
-			  });
-		  }		
-		  */
+		   divHistory.appendChild(p);
 	  });
 	 
 		
