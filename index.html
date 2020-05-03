@@ -137,7 +137,6 @@
 		  	  </button>
 			  
 		  </div>
-		  Content of history
 	  </div>
 		
 	  
@@ -468,12 +467,9 @@
 		  db.states.toArray().then((arr => {
 			  
 			  for(let s of arr){				
-				  //let p = document.createElement("p");
 				  var node = document.createTextNode( 
 													 (empty ? "" : ", ") + s.name);
 				  p.appendChild(node);
-				  //p.textContext = s.name;
-				  //divHistory.appendChild(p);
 			  	  empty = false;
 			  }
 			    
@@ -484,6 +480,13 @@
 	  });
 	 
 		
+		
+		//service worker
+		if('serviceWorker' in navigator) {
+		  navigator.serviceWorker
+				   .register('/sw.js')
+				   .then(function() { console.log("Service Worker Registered"); });
+		}
 
     </script>
   </body>
