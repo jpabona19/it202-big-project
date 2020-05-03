@@ -451,12 +451,34 @@
 		  //
           // Define your database
           //
+          var divHistory = document.querySelector("#divHistory");
           var db = new Dexie("states_database");
           db.version(1).stores({
 			  states: 'name'
-              //friends: 'name,shoeSize'
           });
+		  
 
+		  for(var i = 0; i < statesList.length; i++){
+				db.states.add({name: statesList[i]});
+		  }
+		  //let h = 0;
+		  
+		  //const states = db.states.toArray();
+		  
+		  db.states.toArray().then((arr => {
+			  
+			  for(let s of arr){
+				  let p = document.createElement("p");
+				  p.textContext = s.name;
+				  divHistory.appendChild(p);
+			  }
+			    
+			  
+		  }));
+		  
+		  
+		  
+/*
           //
           // Put some data into it
           
@@ -471,33 +493,11 @@
 				  divHistory.appendChild(elem);
 				  
 				  
-				  //alert("Added to List " + states.name);
-				  
 			  }).catch(function(error){
 				  alert("oops: " + error);
 			  });
 		  }		
-		/*
-          db.friends.put({name: "Nicolas", shoeSize: 8}).then (function(){
-              //
-              // Then when data is stored, read from it
-              //
-              return db.friends.get('Nicolas');
-          }).then(function (friend) {
-              //
-              // Display the result
-              //
-              alert ("Nicolas has shoe size " + friend.shoeSize);
-          }).catch(function(error) {
-             //
-             // Finally don't forget to catch any error
-             // that could have happened anywhere in the
-             // code blocks above.
-             //
-             alert ("Ooops: " + error);
-          });
 		  */
-		  
 	  });
 	 
 		
