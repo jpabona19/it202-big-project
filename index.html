@@ -42,18 +42,22 @@
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
           <span class="mdc-list-item__text">Home</span>
         </a>
-        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Map');">
+        <a class="mdc-list-item" href="#search" onclick = "return showScreen('#Search', '#Home', '#Table', '#Graph', '#History');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
           <span class="mdc-list-item__text">Search</span>
         </a>
-        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Map');">
+        <a class="mdc-list-item" href="#table" onclick = "return showScreen('#Table', '#Search', '#Home', '#Graph', '#History');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true" >table_chart</i>
           <span class="mdc-list-item__text">Table</span>
         </a>
-		<a class="mdc-list-item" href="#map" onclick = "return showScreen('#Map', '#Search', '#Table', '#Home');">
+		<a class="mdc-list-item" href="#Graph" onclick = "return showScreen('#Graph', '#Search', '#Table', '#Home', 'History');">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">map</i>
-          <span class="mdc-list-item__text">Map</span>
-        </a>    
+          <span class="mdc-list-item__text">Graph</span>
+        </a>  
+		  <a class="mdc-list-item" href="#History" onclick = "return showScreen('#History', '#Graph', '#Search', '#Table', '#Home');">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">history</i>
+          <span class="mdc-list-item__text">History</span>
+        </a>  
       </nav>
     </div>
   </aside>
@@ -79,7 +83,7 @@
 	 
 	  <div class="viewHidden" id="Search">
 		  <h1>Search</h1>
-		  <p>Find states to chart by typing in the box below</p>
+		  <p>Find states to compare by typing in the box below</p>
 		  <p>Click add to add a state to your list</p>
 		  <p>Choose a statistic to report and click the corresponding button</p>
 		  <input id="state" list="states" class="mdc-text-field__input"> 
@@ -115,7 +119,7 @@
 			  
 		  </div>	  
 	  </div>
-	  <!--
+	  
 	  <div class="viewHidden" id="Graph">
 		  <div id="divGraph">
 			  
@@ -123,31 +127,21 @@
 		  </div>
 		  Content of graph
 	  </div>
-		-->
 	  
-	  <div class="viewHidden" id="Map">
-		  <!--
-		  <div id="divMap">
+	  <div class="viewHidden" id="History">
+		  <div id="divHistory">
+			  
 			  
 		  </div>
-		  <button id="mapButton" class="mdc-button mdc-button--raised">
-				  <div class="mdc-button__ripple"></div>
-				  <span class="mdc-button__label">My Location</span>
-		  </button>
-			
--->
-		  <div id="mapholder"></div>
-		  <form>
-			 <input type="button" onclick="getLocation();" value="Your Location"/>
-		  </form>
-		  Content of Map
+		  Content of history
 	  </div>
+		
 	  
 	  
   </main>
 
 
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"> </script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
     mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
 		
@@ -157,8 +151,10 @@
 
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 	const statesEndpoint =  "https://covidtracking.com/api/v1/states/daily.json"; 
+	const endpoint2 = "https://covidtracking.com/api/v1/states/current.json";
 	const statesList = [];
 	let data;
+	let currentData;
 	let positive = false;
 	let recovered = false;	
 	let death = false;
@@ -173,12 +169,12 @@
       );
 	  
 	  //handles which screen to show	
-	  const showScreen = (shown, hidden1, hidden2, hidden3) => {
+	  const showScreen = (shown, hidden1, hidden2, hidden3, hidden4) => {
 		  document.querySelector(shown).setAttribute("class", "viewShown");
 		  document.querySelector(hidden1).setAttribute("class", "viewHidden");
 		  document.querySelector(hidden2).setAttribute("class", "viewHidden");
 		  document.querySelector(hidden3).setAttribute("class", "viewHidden");
-		  //document.querySelector(hidden4).setAttribute("class", "viewHidden");
+		  document.querySelector(hidden4).setAttribute("class", "viewHidden");
 
 
 		  return false;
@@ -219,6 +215,20 @@
           })
 
       });
+	
+		
+		//fetch data from json	
+      window.addEventListener("load",() => {
+        fetch(endpoint2)
+          .then (response => response.json())
+          .then (json => {
+            currentData = json;			
+          })
+
+      });
+		
+		
+		
 	
 		document.querySelector("#addButton")
 			.addEventListener("click",(e) => {
@@ -374,54 +384,63 @@
 		 
 	  }	
 	  
+	  //creates line chart
+	  const generateGraph = () => {
+		let chartInfo = [];
+		  
+		 
+        let statesAxis = [];
+        for (let i of statesList) {
+          statesAxis.push(i);
+        }
+		
+		//creates array for chart with data
+        chartInfo.push(statesAxis);
+		
+		let dataArr = [];
+		for(let j = 0; j < currentData.length; j++){
+			//let dataArr = [];
+			let foundState = statesList.find(element => element === currentData[j].state);
+			if(foundState){
+				dataArr.push(currentData[j].positive);
+			}
+			chartInfo.push(dataArr);
+			
+		}  
+		//let i = 0;  
+		          
+		
+        var dataArray = google.visualization.arrayToDataTable(chartInfo);
+		  
+		var view = new google.visualization.DataView(dataArray);
+		view.setColumns([0,1]);  
+		  
+		  
+		//format of chart  
+        var chartFormat = {
+          title: 'Line Chart of Positive Cases',
+          width: window.innerWidth * .7,
+          height: window.innerHeight * .7,
+          legend: { 
+			  position: 'side' 
+		  }
+       	 };
+
+        var graph = new google.visualization.BarChart(document.querySelector('#Graph'));
+        graph.draw(dataArray, chartFormat);
+		  
+		 
+	  }
+	  
+	  
 	  
 	  document.querySelector("#graphButton")
 		  .addEventListener("click", (e) => {
-		  generateTable(); 	   
+		  generateTable();
+		  generateGraph();
 	   });
  
-	 //generate map
-	 function showLocation(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            var latlongvalue = position.coords.latitude + ","
-                              + position.coords.longitude;
-		 /*
-            var img_url = "https://maps.googleapis.com/maps/api/staticmap?center="
-                          +latlongvalue+"&zoom=14&size = 400x300&key = AIzaSyB3OimhANJyTXHyq1paiF2GLLR1Ww5f4QE";
-						  */
-		 	var img_url = 
-            document.getElementById("mapholder").innerHTML =
-            "<img src ='"+img_url+"'>";
-         }
-         function errorHandler(err) {
-            if(err.code == 1) {
-               alert("Error: Access is denied!");
-            }else if( err.code == 2) {
-               alert("Error: Position is unavailable!");
-            }
-         }
-         function getLocation(){
-            if(navigator.geolocation){
-               // timeout at 60000 milliseconds (60 seconds)
-               var options = {timeout:60000};
-               navigator.geolocation.getCurrentPosition
-               (showLocation, errorHandler, options);
-            }else{
-               alert("Sorry, browser does not support geolocation!");
-            }
-         }
 	 
-	 
-	 
-		
-		/*
-		document.querySelector("#mapButton")
-		  .addEventListener("click", (e) => {
-		  	//generate map
-	 		initMap();	
-	   });
-	   */
 		
 
     </script>
